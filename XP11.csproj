@@ -58,8 +58,5 @@
       <Name>SimFeedbackTelemetryProvider</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="xp11.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
