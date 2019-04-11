@@ -10,10 +10,22 @@ namespace XP11
 
         private static readonly float G = 9.81f;
         public int IsRaceOn = 1;
-        private float _accY;
+        private float _accY, _pitch, _roll;
 
         public float Pitch; //degrees
-        public float Roll; //degrees
+        public float Roll //degrees
+        {
+            get
+            {
+                if (_roll < -90) return (-90 - (_roll + 90));
+                if (_roll > 90) return (90 - (_roll - 90));
+                return _roll;
+            }
+            set
+            {
+                _roll = value;
+            }
+        }
         public float AccelerationX; //m/s^2
         public float AccelerationY { get { return _accY - G; } set { _accY = value; } } //m/s^2
         public float AccelerationZ; //m/s^2
