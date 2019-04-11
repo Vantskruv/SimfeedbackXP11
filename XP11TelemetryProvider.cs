@@ -73,8 +73,8 @@ namespace XP11
         {
             Author = "Vantskruv";
             Version = "v0.1";
-            BannerImage = @"img\banner_simfeedback.png"; // Image shown on top of the profiles tab
-            IconImage = @"img\simfeedback.png";          // Icon used in the tree view for the profile
+            BannerImage = @"img\banner_xp11.png"; // Image shown on top of the profiles tab
+            IconImage = @"img\xp11.jpg";          // Icon used in the tree view for the profile
 
             readSettings();
         }

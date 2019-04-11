@@ -58,5 +58,9 @@
       <Name>SimFeedbackTelemetryProvider</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="banner_xp11.png" />
+    <Content Include="xp11.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
