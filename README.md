@@ -22,4 +22,8 @@ Current available datastreams, which is added in the XML file, from X-Plane is:
 <b>Roll</b> (degrees)  
 <b>AccelerationX</b> (m/s^2) Left<>Right  
 <b>AccelerationY</b> (m/s^2) Up<>Down  
-<b>AccelerationZ</b> (m/s^2) Forward<>Backward  
+<b>AccelerationZ</b> (m/s^2) Forward<>Backward
+
+<b>Changes from v0.2</b>  
+* Fixed a bug crashing the mother of all Simfeedback when adding a new effect in the GUI
+* Added a softstart feature for the plugin. Note this will only apply when pressing the start, and you are sitting in the airplane (getting telemetry data from X-Plane. It takes 10 seconds for the alignment (including the SFX-100 movement to neutral position) from when you have pressed start, if you get direct connection from the simulator.
