@@ -72,7 +72,7 @@ namespace XP11
         public XP11TelemetryProvider() : base()
         {
             Author = "Vantskruv";
-            Version = "v0.1";
+            Version = "v0.2";
             BannerImage = @"img\banner_xp11.png"; // Image shown on top of the profiles tab
             IconImage = @"img\xp11.jpg";          // Icon used in the tree view for the profile
 
@@ -88,7 +88,7 @@ namespace XP11
 
         public override string[] GetValueList()
         {
-            return null;
+            return GetValueListByReflection(typeof(XP11Data));
         }
 
         public override void Start()
@@ -112,6 +112,14 @@ namespace XP11
             XP11Data data;
             Session session = new Session();
             Stopwatch sw = new Stopwatch();
+            Stopwatch sSTimer = new Stopwatch(); //softStartTimer
+            float sSMul = 0.0f; //softStartMultiplier (1.0f is the normal ratio for telemetry data), calculated with equation (sSTimer - sSWaitForALign)/sStime
+            float sSTime = 5000f; //softStartTime, amount of milliseconds for the softstart to occur, starting after time sSWaitForAlign.
+            //softStartWaitForAlign, the time it takes for the SFX-100 to elevate to neutral height.
+            //Important: it takes about 3 seconds for the rig to start using telemetry data, if sSWaitForAlign is set below 3 seconds,
+            //somehow the rig jumps directly to the telemetry position. I am not sure what is causing this....5 seconds seems like a secure value
+            //So a total of 10 seconds until the rig is fully aligned to telemetry data.
+            float sSWaitForAlign = 5000f; 
             sw.Start();
 
             UdpClient socket = new UdpClient();
@@ -119,7 +127,8 @@ namespace XP11
             socket.Client.Bind(new IPEndPoint(IPAddress.Any, PORTNUM));
 
             Log("Listener started (port: " + PORTNUM.ToString() + ") XP11TelemetryProvider.Thread");
-
+            sSTimer.Reset();
+            sSTimer.Start();
             while (!isStopped)
             {
                 try
@@ -140,8 +149,20 @@ namespace XP11
                         IsConnected = true;
                     }
 
+                    //Calculate the sofStartMultiplier from where when user presses start + sSWaitForAlign extra time for the SFX-100 to go to neutral position.
+                    //The time for the softstart alignment is sSTime.
+                    if (sSMul < 1.0f && sSTimer.ElapsedMilliseconds>sSWaitForAlign)
+                    {
+                        sSMul = (sSTimer.ElapsedMilliseconds-sSWaitForAlign) / sSTime;
+                        if(sSMul>=1.0f)
+                        {
+                            sSMul = 1.0f;
+                            sSTimer.Stop();
+                        }
+                    }
+
                     Byte[] received = socket.Receive(ref _senderIP);
-                    data = new XP11Data(received);
+                    data = new XP11Data(received, sSMul);
 
                     if (data.IsRaceOn == 1)
                     {
@@ -156,9 +177,6 @@ namespace XP11
                     }
 
                     sw.Restart();
-                    //Thread.Sleep(SamplePeriod);
-
-
                 }
                 catch (Exception)
                 {

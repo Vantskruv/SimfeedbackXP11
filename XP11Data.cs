@@ -7,35 +7,40 @@ namespace XP11
     {
         #region Telemetry Property
         //private static float Rad2Deg(float v) { return (float)(v * 180 / Math.PI); }
-
-        private static readonly float G = 9.81f;
         public int IsRaceOn = 1;
-        private float _accY, _pitch, _roll;
+        private static readonly float G = 9.81f;
 
-        public float Pitch; //degrees
+        private float _accX = 0.0f;
+        private float _accY = 0.0f;
+        private float _accZ = 0.0f;
+        private float _pitch = 0.0f;
+        private float _roll = 0.0f;
+        private readonly float sSMul = 0.0f; //softStartMultiplier
+
+        public float Pitch { get { return _pitch * sSMul; } set { _pitch = value; } } //degrees
         public float Roll //degrees
         {
             get
             {
-                if (_roll < -90) return (-90 - (_roll + 90));
-                if (_roll > 90) return (90 - (_roll - 90));
-                return _roll;
+                if (_roll < -90) return (-90 - (_roll + 90)) * sSMul;
+                if (_roll > 90) return (90 - (_roll - 90)) * sSMul;
+                return _roll * sSMul;
             }
             set
             {
                 _roll = value;
             }
         }
-        public float AccelerationX; //m/s^2
-        public float AccelerationY { get { return _accY - G; } set { _accY = value; } } //m/s^2
-        public float AccelerationZ; //m/s^2
+        public float AccelerationX { get { return _accX*sSMul; } set { _accX = value; } } //m/s^2
+        public float AccelerationY { get { return (_accY - G)*sSMul; } set { _accY = value; } } //m/s^2
+        public float AccelerationZ { get { return _accZ*sSMul; } set {_accZ = value;} } //m/s^2
 
-        public float RollSpeed; //rad/s
-        public float PitchSpeed; //rad/s
-        public float YawSpeed; //rad/s
+        //public float RollSpeed; //rad/s
+        //public float PitchSpeed; //rad/s
+        //public float YawSpeed; //rad/s
         #endregion
 
-        public XP11Data(byte[] rawTelemetryData)
+        public XP11Data(byte[] rawTelemetryData, float _sSMul)
         {
             //The format of the data packet where:
             //* the first five bytes describes the type of packet, ignore last byte
@@ -46,6 +51,7 @@ namespace XP11
             //i 0 0 0 ffff ffff ffff ffff ffff ffff ffff ffff
             //and so on
 
+            sSMul = _sSMul;
             int requiredDataRead = 2;   //We exit the for loop when this variable is 0 (decreased when index 17 and 135 is found).
             String cString = "44-41-54-41"; // "DATA";
             String iString = BitConverter.ToString(rawTelemetryData, 0, 4);
@@ -59,16 +65,16 @@ namespace XP11
                     {
                         case 17: //Pitch, Roll, True heading, Magnetic heading
                             Pitch = BitConverter.ToSingle(rawTelemetryData, i + 4);
-                            Roll = BitConverter.ToSingle(rawTelemetryData, i + 8);
+                            Roll =  BitConverter.ToSingle(rawTelemetryData, i + 8);
                             requiredDataRead--;
                             break;
                         case 135: //AccX, AccY, AccZ, Roll-, Pitch-, Yaw-Speed
                             AccelerationX = BitConverter.ToSingle(rawTelemetryData, i + 4);
                             AccelerationY = BitConverter.ToSingle(rawTelemetryData, i + 8);
                             AccelerationZ = BitConverter.ToSingle(rawTelemetryData, i + 12);
-                            RollSpeed = BitConverter.ToSingle(rawTelemetryData, i + 14);
-                            PitchSpeed = BitConverter.ToSingle(rawTelemetryData, i + 18);
-                            YawSpeed = BitConverter.ToSingle(rawTelemetryData, i + 22);
+                            //RollSpeed = BitConverter.ToSingle(rawTelemetryData, i + 14);
+                            //PitchSpeed = BitConverter.ToSingle(rawTelemetryData, i + 18);
+                            //YawSpeed = BitConverter.ToSingle(rawTelemetryData, i + 22);
                             requiredDataRead--;
                             break;
                     }//switch
