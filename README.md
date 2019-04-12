@@ -20,9 +20,6 @@ PPS in this case is the UDP-rate in X-Plane Data Output settings.
 Current available datastreams, which is added in the XML file, from X-Plane is:  
 <b>Pitch</b> (degrees)  
 <b>Roll</b> (degrees)  
-<b>PitchSpeed</b> (rad/s)  
-<b>RollSpeed</b> (rad/s)  
-<b>YawSpeed</b> (rad/s)  
 <b>AccelerationX</b> (m/s^2) Left<>Right  
 <b>AccelerationY</b> (m/s^2) Up<>Down  
 <b>AccelerationZ</b> (m/s^2) Forward<>Backward  
